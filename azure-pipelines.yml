@@ -63,3 +63,10 @@ stages:
 
     - script: trivy image docker/simple-java-project.git:latest
       displayName: 'Run Trivy Scan'
+
+    - task: AzureWebApp@1
+      inputs:
+        azureSubscription: 'Azure subscription 1(2)(ca52b95b-4022-4936-b687-7ab32c2a72fb)'
+        appType: 'webAppLinux'
+        appName: 'test-windows'
+        package: '$(System.DefaultWorkingDirectory)/**/*.zip'
