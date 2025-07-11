@@ -1,0 +1,57 @@
+trigger:
+- master  #your branch name
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+stages:
+- stage: Checkout
+  displayName: 'Checkout Code'
+  jobs:
+  - job: Checkout
+    steps:
+    - checkout: self
+      displayName: 'Checkout source code'
+
+- stage: BuildTest
+  displayName: 'Compile & Test using Maven'
+  dependsOn: Checkout
+  jobs:
+  - job: MavenBuildTest
+    displayName: 'Maven Build and Unit Test'
+    steps:
+    - script: |
+        echo "Cleaning specific Maven artifact..."
+        rm -rf ~/.m2/repository/ru/job4j/chess
+      displayName: 'Clean job4j:chess from local Maven cache'
+
+    - task: Maven@4
+      displayName: 'Run Maven Clean Compile Test'
+      inputs:
+        mavenPomFile: 'pom.xml'
+        goals: 'clean compile test'
+        mavenOptions: '-Xmx1024m'
+        javaHomeOption: 'JDKVersion'
+        jdkVersionOption: '1.11'
+        publishJUnitResults: true
+        testResultsFiles: '**/surefire-reports/TEST-*.xml'
+
+    - task: SonarQubePrepare@7
+      inputs:
+        SonarQube: 'Sonarqubeconnection'
+        scannerMode: 'cli'
+        configMode: 'file'
+        extraProperties: 'sonar.java.binaries=.'
+
+    - task: dependency-check-build-task@6
+      inputs:
+        projectName: 'Square'
+        scanPath: '.'
+        format: 'HTML'
+        uploadReports: true
+
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'dockerconnection'
+        command: 'buildAndPush'
+        Dockerfile: '**/Dockerfile'
