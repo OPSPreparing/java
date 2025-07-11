@@ -56,10 +56,8 @@ stages:
         command: 'buildAndPush'
         Dockerfile: '**/Dockerfile'
 
-    # - task: trivy@2
-    #   inputs:
-    #     version: 'latest'
-    #   displayName: 'Trivy'
+    - task: trivy@2
+      displayName: 'Trivy'
 
     - script: trivy image docker/simple-java-project.git:latest
       displayName: 'Run Trivy Scan'
