@@ -1,0 +1,4 @@
+# Avoid copying unwanted files into Docker build context
+target/
+.git
+.gitignore
