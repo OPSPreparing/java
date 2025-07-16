@@ -1,6 +1,6 @@
 # Stage 1: Build the app using Maven
 FROM maven:3.9.6-eclipse-temurin-17-alpine AS build
-WORKDIR /ap
+WORKDIR /app
 COPY pom.xml .
 COPY src ./src
 RUN mvn clean package -DskipTests
